@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mausam/additional_information_widget.dart';
 import 'package:mausam/hourly_weather_forecast_widget.dart';
+import 'package:mausam/weather_card_widget.dart';
 
 class MausamScreen extends StatelessWidget {
   const MausamScreen({super.key});
@@ -24,79 +25,68 @@ class MausamScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: Center(
+      body: const Center(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(
-                width: double.infinity,
-                height: 200,
-                child: Card(
-                  elevation: 5,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
-                    child: const Padding(
-                      padding: EdgeInsets.all(16.0),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Text(
-                            "15 °C",
-                            style: TextStyle(
-                              fontSize: 32,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Icon(
-                            Icons.cloud,
-                            size: 50,
-                          ),
-                          Text(
-                            "Cloudy",
-                            style: TextStyle(
-                              color: Colors.lightBlueAccent,
-                              fontSize: 18,
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
+              WeatherCard(
+                temperature: "15 °C",
+                icon: Icons.cloud,
+                weather: "Cloudy",
               ),
-              const SizedBox(height: 20),
-              const Text(
+              SizedBox(height: 20),
+              Text(
                 "Weather Forecast",
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(height: 10),
-              const SingleChildScrollView(
+              SizedBox(height: 10),
+              SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
                   children: [
-                    HourlyWeatherForecastWidget(),
-                    HourlyWeatherForecastWidget(),
-                    HourlyWeatherForecastWidget(),
-                    HourlyWeatherForecastWidget(),
-                    HourlyWeatherForecastWidget(),
+                    HourlyWeatherForecastWidget(
+                      time: "09:00",
+                      icon: Icons.cloud,
+                      temperature: "15°C",
+                    ),
+                    HourlyWeatherForecastWidget(
+                      time: "09:00",
+                      icon: Icons.cloud,
+                      temperature: "15°C",
+                    ),
+                    HourlyWeatherForecastWidget(
+                      time: "09:00",
+                      icon: Icons.cloud,
+                      temperature: "15°C",
+                    ),
+                    HourlyWeatherForecastWidget(
+                      time: "09:00",
+                      icon: Icons.cloud,
+                      temperature: "15°C",
+                    ),
+                    HourlyWeatherForecastWidget(
+                      time: "09:00",
+                      icon: Icons.cloud,
+                      temperature: "15°C",
+                    ),
                   ],
                 ),
               ),
-              const SizedBox(height: 20),
-              const Text(
+              SizedBox(height: 20),
+              Text(
                 "Additional Information",
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(height: 10),
-              const Row(
+              SizedBox(height: 10),
+              Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   AdditionalInformationWidget(
