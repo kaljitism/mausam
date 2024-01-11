@@ -15,9 +15,7 @@ class MausamScreen extends StatefulWidget {
 }
 
 class _MausamScreenState extends State<MausamScreen> {
-  String temperature = 'NA';
-
-  Future getCurrentWeather() async {
+  Future<Map<String, dynamic>> getCurrentWeather() async {
     try {
       String cityName = 'Kanpur';
       final response = await http.get(Uri.parse(
@@ -26,9 +24,7 @@ class _MausamScreenState extends State<MausamScreen> {
       if (data['cod'] != '200') {
         throw 'An Unexpected Error occurred';
       }
-      temperature =
-          kelvinToCelsius(data['list'][0]['main']['temp']).toStringAsFixed(2);
-      setState(() {});
+      return data;
     } catch (e) {
       throw e.toString();
     }
@@ -39,24 +35,38 @@ class _MausamScreenState extends State<MausamScreen> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    getCurrentWeather();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: _buildAppBar(),
-      body: temperature == 'NA'
-          ? const Center(child: CircularProgressIndicator())
-          : Center(
-              child: Padding(
+      body: Center(
+        child: FutureBuilder(
+            future: getCurrentWeather(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+              if (snapshot.hasError) {
+                return Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(snapshot.error.toString()),
+                  ),
+                );
+              }
+
+              final data = snapshot.data!;
+              final currentTemperature =
+                  kelvinToCelsius(data['list'][0]['main']['temp'])
+                      .toStringAsFixed(2);
+
+              return Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildWeatherCard(),
+                    _buildWeatherCard(currentTemperature),
                     const SizedBox(height: 20),
                     const Text(
                       "Weather Forecast",
@@ -79,8 +89,9 @@ class _MausamScreenState extends State<MausamScreen> {
                     _buildAdditionalInformationWidget(),
                   ],
                 ),
-              ),
-            ),
+              );
+            }),
+      ),
     );
   }
 
@@ -103,9 +114,9 @@ class _MausamScreenState extends State<MausamScreen> {
     );
   }
 
-  WeatherCard _buildWeatherCard() {
+  WeatherCard _buildWeatherCard(temperature) {
     return WeatherCard(
-      temperature: "${temperature ?? ""}°C",
+      temperature: "$temperature °C",
       icon: Icons.cloud,
       weather: "Cloudy",
     );
