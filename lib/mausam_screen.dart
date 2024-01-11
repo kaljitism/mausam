@@ -1,69 +1,113 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:mausam/additional_information_widget.dart';
 import 'package:mausam/hourly_weather_forecast_widget.dart';
+import 'package:mausam/secrets.dart';
 import 'package:mausam/weather_card_widget.dart';
 
-class MausamScreen extends StatelessWidget {
+class MausamScreen extends StatefulWidget {
   const MausamScreen({super.key});
+
+  @override
+  State<MausamScreen> createState() => _MausamScreenState();
+}
+
+class _MausamScreenState extends State<MausamScreen> {
+  String temperature = 'NA';
+
+  Future getCurrentWeather() async {
+    try {
+      String cityName = 'Kanpur';
+      final response = await http.get(Uri.parse(
+          'http://api.openweathermap.org/data/2.5/forecast?q=$cityName,in&APPID=$openWeatherAPIKey'));
+      final data = jsonDecode(response.body);
+      if (data['cod'] != '200') {
+        throw 'An Unexpected Error occurred';
+      }
+      temperature =
+          kelvinToCelsius(data['list'][0]['main']['temp']).toStringAsFixed(2);
+      setState(() {});
+    } catch (e) {
+      throw e.toString();
+    }
+  }
+
+  double kelvinToCelsius(double temperatureKelvin) {
+    return temperatureKelvin - 273.15;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getCurrentWeather();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: _buildAppBar(),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildWeatherCard(),
-              const SizedBox(height: 20),
-              const Text(
-                "Weather Forecast",
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
+      body: temperature == 'NA'
+          ? const Center(child: CircularProgressIndicator())
+          : Center(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildWeatherCard(),
+                    const SizedBox(height: 20),
+                    const Text(
+                      "Weather Forecast",
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    _buildWeatherForecastWidget(),
+                    const SizedBox(height: 20),
+                    const Text(
+                      "Additional Information",
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    _buildAdditionalInformationWidget(),
+                  ],
                 ),
               ),
-              const SizedBox(height: 10),
-              _buildWeatherForecastWidget(),
-              const SizedBox(height: 20),
-              const Text(
-                "Additional Information",
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 10),
-              _buildAdditionalInformationWidget(),
-            ],
-          ),
-        ),
-      ),
+            ),
     );
   }
 
-  Row _buildAdditionalInformationWidget() {
-    return const Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: [
-        AdditionalInformationWidget(
-          icon: Icons.water_drop,
-          text: "Humidity",
-          value: "94",
-        ),
-        AdditionalInformationWidget(
-          icon: Icons.air,
-          text: "Wind Speed",
-          value: "7.67",
-        ),
-        AdditionalInformationWidget(
-          icon: Icons.beach_access,
-          text: "Pressure",
-          value: "1006",
+  AppBar _buildAppBar() {
+    return AppBar(
+      title: const Text(
+        "Mausam",
+        style: TextStyle(fontWeight: FontWeight.bold),
+      ),
+      centerTitle: true,
+      actions: [
+        InkWell(
+          onTap: () {},
+          child: IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () {},
+          ),
         ),
       ],
+    );
+  }
+
+  WeatherCard _buildWeatherCard() {
+    return WeatherCard(
+      temperature: "${temperature ?? ""}°C",
+      icon: Icons.cloud,
+      weather: "Cloudy",
     );
   }
 
@@ -102,28 +146,24 @@ class MausamScreen extends StatelessWidget {
     );
   }
 
-  WeatherCard _buildWeatherCard() {
-    return const WeatherCard(
-      temperature: "15 °C",
-      icon: Icons.cloud,
-      weather: "Cloudy",
-    );
-  }
-
-  AppBar _buildAppBar() {
-    return AppBar(
-      title: const Text(
-        "Mausam",
-        style: TextStyle(fontWeight: FontWeight.bold),
-      ),
-      centerTitle: true,
-      actions: [
-        InkWell(
-          onTap: () {},
-          child: IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () {},
-          ),
+  Row _buildAdditionalInformationWidget() {
+    return const Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        AdditionalInformationWidget(
+          icon: Icons.water_drop,
+          text: "Humidity",
+          value: "94",
+        ),
+        AdditionalInformationWidget(
+          icon: Icons.air,
+          text: "Wind Speed",
+          value: "7.67",
+        ),
+        AdditionalInformationWidget(
+          icon: Icons.beach_access,
+          text: "Pressure",
+          value: "1006",
         ),
       ],
     );
