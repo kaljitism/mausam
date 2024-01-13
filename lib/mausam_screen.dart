@@ -115,14 +115,11 @@ class _MausamScreenState extends State<MausamScreen> {
       ),
       centerTitle: true,
       actions: [
-        InkWell(
-          onTap: () {
+        IconButton(
+          icon: const Icon(Icons.refresh),
+          onPressed: () {
             setState(() {});
           },
-          child: IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () {},
-          ),
         ),
       ],
     );
