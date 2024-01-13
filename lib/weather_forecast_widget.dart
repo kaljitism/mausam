@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class HourlyWeatherForecastWidget extends StatelessWidget {
-  const HourlyWeatherForecastWidget({
+class WeatherForecastWidget extends StatelessWidget {
+  const WeatherForecastWidget({
     super.key,
     required this.time,
     required this.icon,
@@ -24,6 +24,8 @@ class HourlyWeatherForecastWidget extends StatelessWidget {
           children: [
             Text(
               time,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
